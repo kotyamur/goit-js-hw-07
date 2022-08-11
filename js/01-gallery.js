@@ -25,6 +25,15 @@ const createPhotoGallary = photos => {
 const galleryMarkup = createPhotoGallary(galleryItems);
 galleryContainer.insertAdjacentHTML('beforeend', galleryMarkup);
 
+const instance = basicLightbox.create(`<img src="" />`, {
+  onShow: instance => {
+    window.addEventListener('keydown', onEscapeClick);
+  },
+  onClose: instance => {
+    window.removeEventListener('keydown', onEscapeClick);
+  },
+});
+
 const onEscapeClick = event => {
   if (event.code === 'Escape') {
     instance.close();
@@ -32,33 +41,13 @@ const onEscapeClick = event => {
 };
 
 const ongalleryContainerClick = evt => {
-    evt.preventDefault();
-    if (evt.target.nodeName !== 'IMG') {
-        return;
-    }
-    const realPicture = evt.target.dataset.source;
-    const instance = basicLightbox.create(
-        `
-            <div class="modal">
-                <img src="${realPicture}" />
-            </div>
-        `,
-        {
-            onShow: instance => {
-                window.addEventListener('keydown', onEscapeClick);
-            },
-            onClose: instance => {
-                window.removeEventListener('keydown', onEscapeClick);
-            },
-        }
-    );
+  evt.preventDefault();
+  if (evt.target.nodeName !== 'IMG') {
+    return;
+  }
+  instance.element().querySelector('img').src = evt.target.dataset.source;
 
-    instance.show();
-    
-    // const el = instance.element();
-    // el.addEventListener('click', () => {
-    //     instance.close();
-    // });
+  instance.show();
 };
 
 galleryContainer.addEventListener('click', ongalleryContainerClick);

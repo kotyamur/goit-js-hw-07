@@ -25,30 +25,40 @@ const createPhotoGallary = photos => {
 const galleryMarkup = createPhotoGallary(galleryItems);
 galleryContainer.insertAdjacentHTML('beforeend', galleryMarkup);
 
+const onEscapeClick = event => {
+  if (event.code === 'Escape') {
+    instance.close();
+  }
+};
+
 const ongalleryContainerClick = evt => {
     evt.preventDefault();
     if (evt.target.nodeName !== 'IMG') {
         return;
     }
     const realPicture = evt.target.dataset.source;
-    const instance = basicLightbox.create(`
-        <div class="modal">
-            <img src="${realPicture}" />
-        </div>
-    `);
+    const instance = basicLightbox.create(
+        `
+            <div class="modal">
+                <img src="${realPicture}" />
+            </div>
+        `,
+        {
+            onShow: instance => {
+                window.addEventListener('keydown', onEscapeClick);
+            },
+            onClose: instance => {
+                window.removeEventListener('keydown', onEscapeClick);
+            },
+        }
+    );
 
     instance.show();
     
-    const el = instance.element();
-    el.addEventListener('click', () => {
-        instance.close();
-    });
-    window.addEventListener('keydown', event => {
-        event.preventDefault();
-        if (event.code === 'Escape') {
-            instance.close();
-        }
-    });
+    // const el = instance.element();
+    // el.addEventListener('click', () => {
+    //     instance.close();
+    // });
 };
 
 galleryContainer.addEventListener('click', ongalleryContainerClick);
